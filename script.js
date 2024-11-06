@@ -1,20 +1,63 @@
-document.getElementById('sendBtn').addEventListener('click', function() {
-    const messageInput = document.getElementById('messageInput');
-    const chatBox = document.getElementById('chatBox');
+// Import the necessary Firebase SDKs
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js";
 
-    if (messageInput.value.trim() === "") return;  // Don't send empty messages
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCszRPflrZXxexQ7IE94Azbfbiz6cuMlT8",
+  authDomain: "love-massage-1eb41.firebaseapp.com",
+  projectId: "love-massage-1eb41",
+  storageBucket: "love-massage-1eb41.firebasestorage.app",
+  messagingSenderId: "353421617638",
+  appId: "1:353421617638:web:dcce91547066745cc40e27",
+  measurementId: "G-YGYKVFXM0Q"
+};
 
-    // Create a new message element
-    const newMessage = document.createElement('div');
-    newMessage.classList.add('message', 'sender');
-    newMessage.textContent = messageInput.value;
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-    // Add the message to the chat box
-    chatBox.appendChild(newMessage);
+// DOM elements
+const messageInput = document.getElementById("message-input");
+const sendBtn = document.getElementById("send-btn");
+const messagesContainer = document.getElementById("messages-container");
 
-    // Scroll to the bottom of the chat box
-    chatBox.scrollTop = chatBox.scrollHeight;
+// Unique user ID (for example, could be entered by user)
+const userId = "user1";  // This can be changed for testing with another device
 
-    // Clear the input field
-    messageInput.value = "";
-});
+// Send a message to Firebase
+function sendMessage() {
+  const message = messageInput.value;
+  if (message.trim() !== "") {
+    const messageRef = ref(db, 'messages/' + userId);
+    set(messageRef, {
+      message: message,
+      timestamp: Date.now()
+    });
+    messageInput.value = '';  // Clear input
+  }
+}
+
+// Display messages from Firebase in real-time
+function displayMessages() {
+  const messagesRef = ref(db, 'messages/');
+  onValue(messagesRef, (snapshot) => {
+    const messages = snapshot.val();
+    messagesContainer.innerHTML = '';  // Clear previous messages
+
+    for (const user in messages) {
+      const message = messages[user];
+      const messageElement = document.createElement("div");
+      messageElement.classList.add("message");
+      messageElement.innerHTML = `<span>${message.message}</span>`;
+      messagesContainer.appendChild(messageElement);
+    }
+  });
+}
+
+// Add event listener to send button
+sendBtn.addEventListener("click", sendMessage);
+
+// Initialize message display
+displayMessages();
+
