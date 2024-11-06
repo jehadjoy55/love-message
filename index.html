@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Messenger</title>
+    <title>Two-Device Real-Time Chat Simulation</title>
     <style>
         body {
             display: flex;
@@ -33,6 +33,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            height: 300px;
         }
 
         .message {
@@ -56,7 +57,6 @@
             display: flex;
             padding: 10px;
             background-color: #f1f1f1;
-            gap: 8px;
             border-top: 1px solid #ddd;
         }
 
@@ -76,98 +76,79 @@
             color: #fff;
             cursor: pointer;
         }
-
-        #input-area button:hover {
-            background-color: #45a049;
-        }
-
-        #exit-button {
-            background-color: #f44336;
-        }
-
-        #exit-button:hover {
-            background-color: #e31e0f;
-        }
     </style>
 </head>
 <body>
     <div id="chat-container">
-        <div id="messages">
-            <!-- Messages will appear here -->
-        </div>
+        <div id="messages"></div>
         <div id="input-area">
-            <input type="text" id="message-input" placeholder="Type a message..." disabled>
-            <button id="send-button" disabled>Send</button>
-            <button id="exit-button">Exit</button>
+            <input type="text" id="message-input" placeholder="Type a message...">
+            <button id="send-button">Send</button>
         </div>
     </div>
 
     <script>
         const sendButton = document.getElementById('send-button');
-        const exitButton = document.getElementById('exit-button');
-        const messages = document.getElementById('messages');
+        const messagesContainer = document.getElementById('messages');
         const messageInput = document.getElementById('message-input');
 
-        let myNickname;
-        let otherNickname;
-        let isConnected = false;
-
-        function initializeChat() {
-            myNickname = prompt("Enter your nickname (Joy or চাঁদ):");
-
-            if (myNickname === "Joy") {
-                otherNickname = "চাঁদ";
-            } else if (myNickname === "চাঁদ") {
-                otherNickname = "Joy";
-            } else {
-                alert("Invalid nickname. Please reload and enter 'Joy' or 'চাঁদ'.");
-                return;
-            }
-
-            alert(`Connected as ${myNickname}. The other user will be ${otherNickname}.`);
-            messageInput.disabled = false;
-            sendButton.disabled = false;
-            isConnected = true;
+        let nickname = prompt("Enter your nickname (Joy or চাঁদ):");
+        if (nickname !== "Joy" && nickname !== "চাঁদ") {
+            alert("Invalid nickname. Please reload and enter 'Joy' or 'চাঁদ'.");
+            throw new Error("Invalid nickname");
         }
 
         function addMessage(text, type) {
             const message = document.createElement('div');
             message.classList.add('message', type);
-            message.textContent = `${type === 'sent' ? myNickname : otherNickname}: ${text}`;
-            messages.appendChild(message);
-            messages.scrollTop = messages.scrollHeight;
+            message.textContent = text;
+            messagesContainer.appendChild(message);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        sendButton.addEventListener('click', () => {
-            if (!isConnected) return;
-
+        function sendMessage() {
             const messageText = messageInput.value.trim();
             if (messageText) {
-                addMessage(messageText, 'sent');
+                const messageData = {
+                    sender: nickname,
+                    text: messageText,
+                    timestamp: Date.now()
+                };
+
+                // Display the message on the sender's screen
+                addMessage(`${nickname}: ${messageText}`, 'sent');
+
+                // Save the message to localStorage to send to other user
+                localStorage.setItem('chat-message', JSON.stringify(messageData));
                 messageInput.value = '';
+            }
+        }
 
-                // Simulate receiving a message from the other user
-                setTimeout(() => {
-                    if (isConnected) {
-                        addMessage(`Reply from ${otherNickname}`, 'received');
-                    }
-                }, Math.random() * 2000 + 500);
+        sendButton.addEventListener('click', sendMessage);
+
+        // Listen for messages from the other user via localStorage
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'chat-message') {
+                const messageData = JSON.parse(event.newValue);
+
+                // Only display the message if it was sent by the other user
+                if (messageData.sender !== nickname) {
+                    addMessage(`${messageData.sender}: ${messageData.text}`, 'received');
+                }
             }
         });
 
-        exitButton.addEventListener('click', () => {
-            if (confirm("Do you want to save the conversation before exiting?")) {
-                alert("Saving as PDF and exiting...");
-                // Placeholder for PDF saving logic
-            } else {
-                alert("Exiting without saving...");
+        // Load initial messages from localStorage if page is refreshed
+        window.addEventListener('load', () => {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('chat-message')) {
+                    const messageData = JSON.parse(localStorage.getItem(key));
+                    const type = messageData.sender === nickname ? 'sent' : 'received';
+                    addMessage(`${messageData.sender}: ${messageData.text}`, type);
+                }
             }
-            isConnected = false; // End the chat session
-            messageInput.disabled = true;
-            sendButton.disabled = true;
         });
-
-        initializeChat(); // Start chat setup
     </script>
 </body>
 </html>
