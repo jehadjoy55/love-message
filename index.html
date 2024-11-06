@@ -3,152 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Two-Device Real-Time Chat Simulation</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-            margin: 0;
-        }
-
-        #chat-container {
-            width: 90%;
-            max-width: 400px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #messages {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            height: 300px;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 10px;
-            color: #ffffff;
-        }
-
-        .message.sent {
-            align-self: flex-end;
-            background-color: #4CAF50;
-        }
-
-        .message.received {
-            align-self: flex-start;
-            background-color: #2196F3;
-        }
-
-        #input-area {
-            display: flex;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-top: 1px solid #ddd;
-        }
-
-        #input-area input[type="text"] {
-            flex: 1;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            outline: none;
-        }
-
-        #input-area button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: #fff;
-            cursor: pointer;
-        }
-    </style>
+    <title>Love Massage Messenger</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="chat-container">
-        <div id="messages"></div>
-        <div id="input-area">
-            <input type="text" id="message-input" placeholder="Type a message...">
-            <button id="send-button">Send</button>
-        </div>
+        <div id="messages-container"></div>
+        <input type="text" id="message-input" placeholder="Enter your message">
+        <button id="send-btn">Send</button>
     </div>
 
-    <script>
-        const sendButton = document.getElementById('send-button');
-        const messagesContainer = document.getElementById('messages');
-        const messageInput = document.getElementById('message-input');
-
-        let nickname = prompt("Enter your nickname (Joy or চাঁদ):");
-        if (nickname !== "Joy" && nickname !== "চাঁদ") {
-            alert("Invalid nickname. Please reload and enter 'Joy' or 'চাঁদ'.");
-            throw new Error("Invalid nickname");
-        }
-
-        function addMessage(text, type) {
-            const message = document.createElement('div');
-            message.classList.add('message', type);
-            message.textContent = text;
-            messagesContainer.appendChild(message);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function sendMessage() {
-            const messageText = messageInput.value.trim();
-            if (messageText) {
-                const messageData = {
-                    sender: nickname,
-                    text: messageText,
-                    timestamp: Date.now()
-                };
-
-                // Display the message on the sender's screen
-                addMessage(`${nickname}: ${messageText}`, 'sent');
-
-                // Save the message to localStorage to send to other user
-                localStorage.setItem('chat-message', JSON.stringify(messageData));
-                messageInput.value = '';
-            }
-        }
-
-        sendButton.addEventListener('click', sendMessage);
-
-        // Listen for messages from the other user via localStorage
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'chat-message') {
-                const messageData = JSON.parse(event.newValue);
-
-                // Only display the message if it was sent by the other user
-                if (messageData.sender !== nickname) {
-                    addMessage(`${messageData.sender}: ${messageData.text}`, 'received');
-                }
-            }
-        });
-
-        // Load initial messages from localStorage if page is refreshed
-        window.addEventListener('load', () => {
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('chat-message')) {
-                    const messageData = JSON.parse(localStorage.getItem(key));
-                    const type = messageData.sender === nickname ? 'sent' : 'received';
-                    addMessage(`${messageData.sender}: ${messageData.text}`, type);
-                }
-            }
-        });
-    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
