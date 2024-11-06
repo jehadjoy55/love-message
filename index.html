@@ -3,26 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qwerty Messenger</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Private Messenger</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        #chat-container {
+            width: 90%;
+            max-width: 400px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            color: #ffffff;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background-color: #4CAF50;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background-color: #2196F3;
+        }
+
+        #input-area {
+            display: flex;
+            padding: 10px;
+            background-color: #f1f1f1;
+            gap: 8px;
+            border-top: 1px solid #ddd;
+        }
+
+        #input-area input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        #input-area button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #input-area button:hover {
+            background-color: #45a049;
+        }
+
+        #exit-button {
+            background-color: #f44336;
+        }
+
+        #exit-button:hover {
+            background-color: #e31e0f;
+        }
+    </style>
 </head>
 <body>
-
-    <!-- Main Chat Container -->
-    <div class="chat-container">
-        <div class="header">
-            <div class="moon"></div>
-            <h1>Qwerty Messenger</h1>
+    <div id="chat-container">
+        <div id="messages">
+            <!-- Messages will appear here -->
         </div>
-        
-        <div class="chat-box" id="chatBox"></div>
-        
-        <div class="message-container">
-            <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
-            <button id="sendBtn">Send</button>
+        <div id="input-area">
+            <input type="text" id="message-input" placeholder="Type a message..." disabled>
+            <button id="send-button" disabled>Send</button>
+            <button id="exit-button">Exit</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const sendButton = document.getElementById('send-button');
+        const exitButton = document.getElementById('exit-button');
+        const messages = document.getElementById('messages');
+        const messageInput = document.getElementById('message-input');
+
+        let myNickname;
+        let otherNickname;
+        let isConnected = false;
+
+        function initializeChat() {
+            myNickname = prompt("Enter your nickname (Joy or চাঁদ):");
+
+            if (myNickname === "Joy") {
+                otherNickname = "চাঁদ";
+            } else if (myNickname === "চাঁদ") {
+                otherNickname = "Joy";
+            } else {
+                alert("Invalid nickname. Please reload and enter 'Joy' or 'চাঁদ'.");
+                return;
+            }
+
+            alert(`Connected as ${myNickname}. The other user will be ${otherNickname}.`);
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+            isConnected = true;
+        }
+
+        function addMessage(text, type) {
+            const message = document.createElement('div');
+            message.classList.add('message', type);
+            message.textContent = `${type === 'sent' ? myNickname : otherNickname}: ${text}`;
+            messages.appendChild(message);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        sendButton.addEventListener('click', () => {
+            if (!isConnected) return;
+
+            const messageText = messageInput.value.trim();
+            if (messageText) {
+                addMessage(messageText, 'sent');
+                messageInput.value = '';
+
+                // Simulate receiving a message from the other user
+                setTimeout(() => {
+                    if (isConnected) {
+                        addMessage(`Reply from ${otherNickname}`, 'received');
+                    }
+                }, Math.random() * 2000 + 500);
+            }
+        });
+
+        exitButton.addEventListener('click', () => {
+            if (confirm("Do you want to save the conversation before exiting?")) {
+                alert("Saving as PDF and exiting...");
+                // Placeholder for PDF saving logic
+            } else {
+                alert("Exiting without saving...");
+            }
+            isConnected = false; // End the chat session
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+        });
+
+        initializeChat(); // Start chat setup
+    </script>
 </body>
 </html>
