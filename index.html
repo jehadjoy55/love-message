@@ -3,8 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>প্রিয়তমা</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>প্রিয়তমা চাঁদ</title>
+    <style>
+        /* General Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to bottom, #1c1c34, #0a0a1a);
+            font-family: 'Georgia', serif;
+            color: #f5f5f5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Twinkling Stars */
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Moon Styling */
+        .moon {
+            position: absolute;
+            top: 20%;
+            right: 10%;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #ffffff, #e0e0e0 50%);
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Tree Shadow Styling */
+        .tree-shadow {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 35vh;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            clip-path: polygon(0% 100%, 15% 65%, 30% 75%, 45% 40%, 60% 70%, 75% 50%, 90% 65%, 100% 100%);
+        }
+
+        /* Poem Container Styling */
+        .letter-container {
+            position: relative;
+            max-width: 600px;
+            width: 90%;
+            padding: 20px 30px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #ffd1dc;
+            text-align: center;
+            font-style: italic;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            z-index: 2;
+            margin-top: 150px;
+        }
+
+        /* Smooth Text Appearance Animation */
+        .letter-text span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInSmooth 1s forwards;
+        }
+
+        /* Sequential Animation Delay */
+        .letter-text span:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+
+        .letter-text span:nth-child(even) {
+            animation-delay: 0.15s;
+        }
+
+        /* Keyframes for Poem Text */
+        @keyframes fadeInSmooth {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .letter-container {
+                font-size: 1rem;
+                padding: 15px 20px;
+            }
+
+            .moon {
+                width: 90px;
+                height: 90px;
+                right: 5%;
+                top: 10%;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Moon -->
@@ -21,6 +140,48 @@
         <div class="letter-text" id="letter"></div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Romantic Poem Content
+        const letterContent = `
+            প্রিয়তমা, 
+            চাঁদের আলোয় তোমার মিষ্টি হাসি, 
+            এই হৃদয় যেন তোমারই ছায়ায় বাসি।
+            তোমার স্পর্শে মুছে যায় সব দুঃখের গাথা,
+            তোমার ভালোবাসা আমার জীবনের পথের প্রভা।
+            প্রিয়তমা, আমার জীবনের প্রতিটি স্বপ্ন তুমি, 
+            তোমার জন্যই সব সুর, সব কবিতা, আর আমার প্রতিটি মুহূর্তের নীরবতা।
+            তোমাকে ভালোবাসি চিরকাল, তোমার পাশে রয়েই যাব, চিরদিন।
+        `;
+
+        const letterElement = document.getElementById("letter");
+
+        // Function to create the animated text effect for the poem
+        function createPoemTextEffect(text) {
+            const words = text.split(/\s+/);
+            words.forEach((word, index) => {
+                const span = document.createElement("span");
+                span.textContent = word + " ";
+                span.style.animationDelay = `${index * 0.2}s`;
+                letterElement.appendChild(span);
+            });
+        }
+
+        // Generate stars for background
+        function generateStars() {
+            for (let i = 0; i < 80; i++) {
+                const star = document.createElement("div");
+                star.className = "star";
+                star.style.top = Math.random() * 100 + "vh";
+                star.style.left = Math.random() * 100 + "vw";
+                star.style.animationDuration = Math.random() * 1 + 1 + "s";
+                document.body.appendChild(star);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            createPoemTextEffect(letterContent);
+            generateStars();
+        });
+    </script>
 </body>
 </html>
